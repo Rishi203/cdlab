@@ -1,131 +1,70 @@
-#include <stdio.h>
-#include <string.h>
-#include <ctype.h>
-char line[100];
+#include<stdio.h>
 
-int is_operator(char c)
-{
-    switch (c)
-    {
-        case '+':   
-        case '-':   
-        case '*':   
-        case '/':   
-        case '=':   
-            printf("%c - Operator\n", c);
-            return 1;
+#include<stdlib.h>
+
+#include<string.h>
+
+#include<ctype.h>
+
+int isKeyword(char buffer[]) {
+  char keywords[32][10] = {
+    "break",
+    "case",
+    "char",
+    "const",
+    "continue",
+    "do",
+    "double",
+    "else",
+    "float",
+    "for",
+    "if",
+    "int",
+    "return",
+    "struct",
+    "switch",
+    "void",
+    "while"
+  };
+  int i;
+  for (i = 0; i < 32; ++i) {
+    if (strcmp(keywords[i], buffer) == 0) {
+      return 1;
     }
-
-    return 0;
+  }
+  return 0;
 }
 
-int is_delimiter(char c)
-{
-    switch (c)
-    {
-        case '{':
-        case '}':
-        case '(':
-        case ')':
-        case '[':
-        case ']':
-        case ',':
-        case ';':
-            printf("%c - Delimiter\n", c);
-            return 1;
+int main() {
+  char c, buffer[31], operators[] = "+-*/%=";
+  FILE * fp;
+  int i, j = 0;
+
+  fp = fopen("Program", "r");
+
+  if (fp == NULL) {
+    printf("Error while opening the file\n");
+    exit(0);
+  }
+
+  while ((c = fgetc(fp)) != EOF) {
+    for (i = 0; i < 6; ++i) {
+      if (c == operators[i])
+        printf("%c is operator\n", c);
     }
 
-    return 0;
-}
+    if (isalnum(c)) {
+      buffer[j++] = c;
+    } else if ((c == ' ' || c == '\t' || c == '\n') && (j != 0)) {
+      buffer[j] = '\0';
+      j = 0;
 
-int is_keyword(char buffer[]){
-	char keywords[32][10] = {"auto","break","case","char","const","continue","default",
-							"do","double","else","enum","extern","float","for","goto",
-							"if","int","long","register","return","short","signed",
-							"sizeof","static","struct","switch","typedef","union",
-							"unsigned","void","volatile","while"};
-	int i;
-	for(i = 0; i < 32; ++i){
-		if(strcmp(keywords[i], buffer) == 0){
-			return 1;
-		}
-	}
-return 0;}
-
-void main()
-{
-    char c;
-    FILE *f = fopen("input.txt", "r");
-
-    while (fgets(line, sizeof(line), f))
-    {
-        // Single line commment '//', skip processing it
-        int flag1 = 0;
-        for (int i = 0; i < strlen(line); i++)
-        {
-            if (line[i] == '/' && line[i + 1] == '/')
-            {
-                flag1 = 1;
-                break;
-            }       
-        }
-        if (flag1)
-            continue;        
-
-        // Multi-line comment '/**/'
-        int flag2 = 0;
-        for (int i = 0; i < strlen(line); i++)
-        {
-            if (line[i] == '/' && line[i + 1] == '*')
-            {
-                // Skip all lines until '*/' has occured
-                while (fgets(line, sizeof(line), f))
-                {
-                    for (int j = 0; j < strlen(line); j++)
-                    {
-                        if (line[j] == '*' && line[j + 1] == '/')
-                            flag2 = 1;
-                    }
-
-                    if (flag2)
-                        break;
-                }
-            }
-        }
-        if (flag2)
-            continue;
-
-        printf("\n%s\n", line);
-
-        char token[100];
-        int index = 0;
-        strcpy(token, "");
-
-        for (int i = 0; i < strlen(line); i++)
-        {
-            if (is_operator(line[i]) || is_delimiter(line[i]) || line[i] == ' ' || line[i] == '\t' || line[i] == '\n')
-            {
-                // Check if the token is an identifier or a keyword
-                if (strcmp(token, "") != 0)
-                {
-                    if (is_keyword(token))
-                        printf("%s - Keyword\n", token);
-                    else if(isdigit(token[0]))
-                        printf("%s - Number\n",token);
-                    else
-                        printf("%s - Identifier\n", token);
-
-                    strcpy(token, "");
-                    index = 0;
-                }
-            }
-            else  
-            {
-                token[index++] = line[i];
-                token[index] = '\0';
-            }
-        }
+      if (isKeyword(buffer) == 1)
+        printf("%s is keyword\n", buffer);
+      else
+        printf("%s is identifier\n", buffer);
     }
-
-    fclose(f);
+  }
+  fclose(fp);
+  return 0;
 }
