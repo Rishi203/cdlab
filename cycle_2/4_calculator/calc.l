@@ -33,12 +33,9 @@ int yylex(void);
 
 
 %}
-
-/* Declare tokens */
 %token NUMBER
 
 %%
-/* Grammar rules for arithmetic expressions */
 start:  expression             { printf(" Result is : %d\n", $1); }
         ;
 
@@ -55,16 +52,15 @@ term:
     ;
 
 factor:
-      '(' expression ')'          { $$ = $2; }     // Value inside parentheses
-    | NUMBER                      { $$ = $1; }     // The value of the number
+      '(' expression ')'          { $$ = $2; }     
+    | NUMBER                      { $$ = $1; }     
     ;
 
 %%
 
-/* Main function */
 int main() {
     printf("Enter an arithmetic expression: ");
-    yyparse();   // Parse the input
+    yyparse();  
     
     return 0;
 }
